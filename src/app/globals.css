@@ -8,91 +8,85 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 0%; /* Pure Black #000000 */
-    --foreground: 0 0% 98%; /* Almost White (for text on black) */
+    --background: 0 0% 94%; /* Light Gray #F0F0F0 */
+    --foreground: 0 0% 13%; /* Dark Gray for text #212121 */
 
-    --card: 0 0% 7%; /* Dark Gray #111111 (for card backgrounds) */
-    --card-foreground: 0 0% 98%; /* Almost White (for text on cards) */
+    --card: 0 0% 100%; /* White for card backgrounds */
+    --card-foreground: 0 0% 13%; /* Dark Gray for text on cards */
 
-    --popover: 0 0% 7%; /* Dark Gray #111111 */
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 180 100% 50%; /* Cyan #00FFFF */
-    --primary-foreground: 0 0% 0%; /* Black (for text on primary buttons/elements) */
+    --primary: 197 71% 52%; /* Strong Blue #29ABE2 */
+    --primary-foreground: 0 0% 100%; /* White for text on primary buttons/elements */
     
-    --secondary: 190 95% 6%; /* Dark Teal #011a1f (e.g., button backgrounds) */
-    --secondary-foreground: 180 100% 50%; /* Cyan (text on dark teal buttons) */
+    --secondary: 197 65% 45%; /* Slightly desaturated/darker blue for secondary actions */
+    --secondary-foreground: 0 0% 100%; /* White */
 
-    --muted: 0 0% 13%; /* Darker Gray #212121 */
-    --muted-foreground: 0 0% 60%; /* Lighter Gray for muted text */
+    --muted: 0 0% 87%; /* Lighter Gray for muted elements #DEDEDE */
+    --muted-foreground: 0 0% 40%; /* Medium Gray for muted text #666666 */
 
-    --accent: 180 100% 50%; /* Cyan, as primary accent */
-    --accent-foreground: 0 0% 0%; /* Black */
+    --accent: 45 100% 85%; /* Soft Yellow #FFECB3 */
+    --accent-foreground: 0 0% 20%; /* Darker text for yellow accent #333333 */
 
     --destructive: 0 80% 60%; /* Red #FF4C4C (for AI indication) */
-    --destructive-foreground: 0 0% 98%; /* Almost White */
+    --destructive-foreground: 0 0% 100%; /* White */
     
-    --success: 180 100% 50%; /* Cyan (for REAL indication, matches primary) */
-    --success-foreground: 0 0% 0%; /* Black */
+    --success: 197 71% 52%; /* Strong Blue (for REAL indication, matches primary) */
+    --success-foreground: 0 0% 100%; /* White */
 
-    --border: 180 100% 50%; /* Cyan (for general borders, input borders) */
-    --input: 0 0% 10%; /* Dark gray for input background #1A1A1A */
-    --ring: 180 100% 50%; /* Cyan for focus rings */
+    --border: 0 0% 80%; /* Medium gray for general borders #CCCCCC */
+    --input-border: 0 0% 70%; /* Slightly darker gray for input borders #B3B3B3 */
+    --input: 0 0% 100%; /* White for input background */
+    --ring: 197 71% 62%; /* Slightly lighter Strong Blue for focus rings */
     
     --radius: 0.75rem; /* 12px, for general rounded corners (10-15px range) */
 
     /* HSL components for box-shadows */
-    --primary-h: 180;
-    --primary-s: 100%;
-    --primary-l: 50%;
+    --primary-h: 197;
+    --primary-s: 71%;
+    --primary-l: 52%;
     --destructive-h: 0;
     --destructive-s: 80%;
     --destructive-l: 60%;
-    --success-h: 180; /* Same as primary for "REAL" indication */
-    --success-s: 100%;
-    --success-l: 50%;
+    --success-h: 197; /* Same as primary for "REAL" indication */
+    --success-s: 71%;
+    --success-l: 52%;
     
-    --chart-1: 180 100% 50%;
-    --chart-2: 210 100% 50%;
-    --chart-3: 240 100% 50%;
-    --chart-4: 270 100% 50%;
-    --chart-5: 300 100% 50%;
+    --chart-1: 197 71% 52%;
+    --chart-2: 210 71% 52%;
+    --chart-3: 45 100% 85%;
+    --chart-4: 270 71% 52%;
+    --chart-5: 300 71% 52%;
   }
 
+  /* Dark mode can be defined here if a toggle is added later */
+  /*
   .dark {
-    /* Dark theme is default, but these ensure consistency if .dark is ever explicitly used */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 180 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 190 95% 6%;
-    --secondary-foreground: 180 100% 50%;
-    --muted: 0 0% 13%;
+    --background: 0 0% 10%; 
+    --foreground: 0 0% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 90%;
+    --primary: 197 71% 58%; 
+    --primary-foreground: 0 0% 10%; 
+    --secondary: 197 65% 50%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 25%;
     --muted-foreground: 0 0% 60%;
-    --accent: 180 100% 50%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 80% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --success: 180 100% 50%;
-    --success-foreground: 0 0% 0%;
-    --border: 180 100% 50%;
-    --input: 0 0% 10%;
-    --ring: 180 100% 50%;
-
-    --primary-h: 180;
-    --primary-s: 100%;
-    --primary-l: 50%;
-    --destructive-h: 0;
-    --destructive-s: 80%;
-    --destructive-l: 60%;
-    --success-h: 180;
-    --success-s: 100%;
-    --success-l: 50%;
+    --accent: 45 90% 75%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 90%;
+    --success: 197 71% 58%;
+    --success-foreground: 0 0% 10%;
+    --border: 0 0% 30%;
+    --input-border: 0 0% 40%;
+    --input: 0 0% 20%;
+    --ring: 197 71% 68%;
   }
+  */
 }
 
 @layer base {
@@ -106,15 +100,15 @@ body {
   }
 }
 
-/* Custom glow effects with pulsing animation */
+/* Custom glow effects adapted for light theme (more like a colored shadow) */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 5px 1px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.3),
-                0 0 10px 2px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.2);
+    box-shadow: 0 0 8px 2px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.25),
+                0 0 15px 3px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.15);
   }
   50% {
-    box-shadow: 0 0 10px 3px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.5),
-                0 0 20px 5px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.3);
+    box-shadow: 0 0 12px 4px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.35),
+                0 0 25px 6px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.2);
   }
 }
 
@@ -127,23 +121,23 @@ body {
 }
 
 .glow-real {
-  --glow-h: var(--primary-h); /* Using primary (Cyan) for REAL */
+  --glow-h: var(--primary-h);
   --glow-s: var(--primary-s);
   --glow-l: var(--primary-l);
   border-color: hsl(var(--primary));
   animation: pulse-glow 2.5s infinite ease-in-out;
 }
 
-/* Futuristic button base style - can be extended in components */
-.futuristic-button {
-  @apply w-full rounded-lg border border-primary bg-secondary py-3 px-4 text-lg font-bold text-primary transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_15px_hsl(var(--primary-h),var(--primary-s),var(--primary-l),0.7)];
+/* App-specific button style based on user prompt for new theme */
+.app-button {
+  @apply w-full rounded-lg border border-primary bg-primary py-3 px-4 text-lg font-bold text-primary-foreground transition-all duration-300 hover:bg-opacity-90 hover:shadow-[0_0_15px_hsl(var(--primary-h),var(--primary-s),var(--primary-l),0.4)];
 }
 
-.futuristic-input {
-  @apply bg-input text-foreground placeholder-muted-foreground border-primary focus:ring-primary focus:border-primary;
+.app-input {
+  @apply bg-input text-foreground placeholder-muted-foreground border-input-border focus:ring-primary focus:border-primary;
 }
 
-/* Custom rounded corners for cards as per spec */
+/* Custom rounded corners for cards */
 .rounded-20px {
   border-radius: 20px;
 }

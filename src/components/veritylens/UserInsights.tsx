@@ -20,9 +20,9 @@ export function UserInsights({ insights, isLoading }: UserInsightsProps) {
         {isLoading && <p className="text-muted-foreground">Generating insights...</p>}
         {!isLoading && !insights && <p className="text-muted-foreground">No insights available yet. Analyze some images to see your stats!</p>}
         {insights && (
-          <Alert className="bg-primary/10 border-primary/50 text-primary rounded-lg">
-            <Lightbulb className="h-5 w-5 text-primary" />
-            <AlertTitle className="font-semibold text-primary">Insight</AlertTitle>
+          <Alert className="bg-accent/20 border-accent/50 text-accent-foreground rounded-lg">
+            <Lightbulb className="h-5 w-5 text-accent" />
+            <AlertTitle className="font-semibold text-accent-foreground">Insight</AlertTitle>
             <AlertDescription className="text-foreground/90">
               {insights}
             </AlertDescription>

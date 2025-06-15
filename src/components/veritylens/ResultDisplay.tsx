@@ -1,10 +1,10 @@
 "use client";
 
-import NextImage from "next/image"; // Renamed to avoid conflict
+import NextImage from "next/image"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { ScanResult } from "@/types";
-import { CpuIcon, CheckCircle2Icon } from "lucide-react"; // Using CheckCircle2Icon for "REAL"
+import { CpuIcon, CheckCircle2Icon, ZapIcon } from "lucide-react"; 
 
 type ResultDisplayProps = {
   result: ScanResult;
@@ -15,16 +15,16 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
   const confidencePercent = Math.round(result.confidenceScore * 100);
 
   const resultText = isAi ? "A.I. GENERATED" : "LIKELY REAL";
-  const resultColorClass = isAi ? "text-destructive" : "text-primary"; // AI Red, REAL Cyan
+  const resultColorClass = isAi ? "text-destructive" : "text-success";
   const glowClass = isAi ? "glow-ai" : "glow-real";
-  const borderColorClass = isAi ? "border-destructive" : "border-primary";
-  const progressTrackClass = isAi ? "[&>div]:bg-destructive" : "[&>div]:bg-primary";
+  const borderColorClass = isAi ? "border-destructive" : "border-success"; // success for 'REAL'
+  const progressTrackClass = isAi ? "[&>div]:bg-destructive" : "[&>div]:bg-success";
   
   const ResultIcon = isAi ? CpuIcon : CheckCircle2Icon;
 
   return (
     <Card 
-      className={`bg-dark-card-bg text-card-foreground shadow-xl rounded-20px p-5 ${glowClass} border-2 ${borderColorClass} animate-fadeIn`}
+      className={`bg-card text-card-foreground shadow-xl rounded-20px p-5 ${glowClass} border-2 ${borderColorClass} animate-fadeIn`}
       aria-live="polite"
     >
       <CardHeader className="p-0 mb-5 text-center">
@@ -34,7 +34,7 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0 space-y-6">
-        <div className={`relative w-full max-w-[280px] md:max-w-[300px] mx-auto aspect-square rounded-full overflow-hidden border-4 ${borderColorClass} ${glowClass} shadow-2xl`}>
+        <div className={`relative w-full max-w-[220px] md:max-w-[250px] mx-auto aspect-square rounded-full overflow-hidden border-4 ${borderColorClass} shadow-lg`}>
           <NextImage
             src={result.previewUrl}
             alt="Analyzed image"
@@ -43,8 +43,7 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
             data-ai-hint="analyzed image content"
             className="rounded-full"
           />
-           {/* Inner shadow for depth (optional) */}
-          <div className="absolute inset-0 rounded-full shadow-[inset_0_0_15px_rgba(0,0,0,0.3)]"></div>
+          <div className={`absolute inset-0 rounded-full ${glowClass} opacity-50`}></div>
         </div>
         
         <div className="space-y-2 pt-2">
@@ -55,11 +54,11 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
           <Progress value={confidencePercent} className={`h-3.5 rounded-full bg-muted/30 ${progressTrackClass}`} />
         </div>
 
-        <div className="text-sm text-muted-foreground p-4 bg-black/30 rounded-lg border border-muted/50 flex items-start gap-3">
-          <ResultIcon className={`h-6 w-6 ${resultColorClass} shrink-0 mt-0.5`} />
+        <div className="text-sm text-muted-foreground p-4 bg-background rounded-lg border border-border flex items-start gap-3">
+          <ZapIcon className={`h-6 w-6 ${resultColorClass} shrink-0 mt-0.5`} />
           <p className="leading-relaxed">
-            This image is classified as {isAi ? "AI-Generated" : "Likely Real"} with {confidencePercent}% confidence. 
-            Analysis based on source: {result.sourceType}. Timestamp: {new Date(result.timestamp).toLocaleString()}.
+            This image is classified as <strong>{isAi ? "AI-Generated" : "Likely Real"}</strong> with {confidencePercent}% confidence. 
+            Source: {result.sourceType}. Timestamp: {new Date(result.timestamp).toLocaleString()}.
           </p>
         </div>
       </CardContent>

@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ImageIcon, CameraIcon, Link2Icon, Loader2, UploadCloud } from "lucide-react";
 import { ChangeEvent, useState, useRef } from "react";
-import NextImage from "next/image"; // Renamed to avoid conflict with HTMLImageElement
+import NextImage from "next/image"; 
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -38,6 +39,7 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const { canScan, showUpgradeModal } = useSubscription();
 
   const {
     control: urlControl,
@@ -69,27 +71,39 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
     }
   };
 
-  const onAnalyzeFile = () => {
-    const currentFile = activeTab === 'gallery' 
-      ? fileInputRef.current?.files?.[0]
-      : cameraInputRef.current?.files?.[0];
-
-    if (currentFile) {
-      const validationResult = fileSchema.safeParse(currentFile);
-      if (validationResult.success) {
-        onAnalyze({ file: currentFile }, 'file');
-      } else {
-         alert(validationResult.error.errors.map(e => e.message).join('\n'));
-      }
-    } else {
-      alert("Please select an image file.");
+  const attemptAnalysis = (analysisFn: () => void) => {
+    if (!canScan()) {
+      showUpgradeModal();
+      return;
     }
+    analysisFn();
+  };
+  
+  const onAnalyzeFile = () => {
+    attemptAnalysis(() => {
+      const currentFile = activeTab === 'gallery' 
+        ? fileInputRef.current?.files?.[0]
+        : cameraInputRef.current?.files?.[0];
+
+      if (currentFile) {
+        const validationResult = fileSchema.safeParse(currentFile);
+        if (validationResult.success) {
+          onAnalyze({ file: currentFile }, 'file');
+        } else {
+           alert(validationResult.error.errors.map(e => e.message).join('\n'));
+        }
+      } else {
+        alert("Please select an image file.");
+      }
+    });
   };
   
   const onAnalyzeUrl = (data: { imageUrl: string }) => {
-    onAnalyze({ url: data.imageUrl }, 'url');
-    setFilePreview(null); 
-    setFileName(null);
+    attemptAnalysis(() => {
+      onAnalyze({ url: data.imageUrl }, 'url');
+      setFilePreview(null); 
+      setFileName(null);
+    });
   };
 
   const clearAllInputs = () => {
@@ -101,12 +115,12 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
     setUrlValue("imageUrl", "");
   };
 
-  const commonButtonClass = "futuristic-button text-lg py-3.5";
-  const commonInputClass = "futuristic-input h-12 text-base file:font-semibold file:border-0 file:bg-transparent file:text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg hover:file:bg-primary/10";
+  const commonButtonClass = "app-button text-lg py-3.5";
+  const commonInputClass = "app-input h-12 text-base file:font-semibold file:border-0 file:bg-transparent file:text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg hover:file:bg-primary/10";
 
 
   return (
-    <Card className="bg-card text-card-foreground shadow-xl rounded-20px border-0">
+    <Card className="bg-card text-card-foreground shadow-lg rounded-20px border-0">
       <CardHeader className="pb-4 pt-6">
         <CardTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
           <UploadCloud size={28} />
@@ -121,7 +135,7 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
           setActiveTab(value as "gallery" | "camera" | "url");
           clearAllInputs();
         }}>
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-secondary/30 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted p-1 rounded-lg">
             <TabsTrigger value="gallery" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
               <ImageIcon className="mr-2" />GALLERY
             </TabsTrigger>
@@ -135,8 +149,8 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
 
           <div className="space-y-6">
             {filePreview && (activeTab === "gallery" || activeTab === "camera") && (
-              <div className="mb-4 p-3 border border-primary/50 rounded-lg bg-black/30 flex flex-col justify-center items-center h-48 overflow-hidden">
-                <NextImage src={filePreview} alt="Selected preview" width={180} height={180} className="max-h-40 w-auto object-contain rounded-md" />
+              <div className="mb-4 p-3 border border-primary/20 rounded-lg bg-background flex flex-col justify-center items-center h-48 overflow-hidden">
+                <NextImage src={filePreview} alt="Selected preview" width={180} height={180} className="max-h-40 w-auto object-contain rounded-md" data-ai-hint="upload preview" />
                 {fileName && <p className="text-xs text-muted-foreground mt-2 truncate max-w-full px-2">{fileName}</p>}
               </div>
             )}

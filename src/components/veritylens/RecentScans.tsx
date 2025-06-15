@@ -38,7 +38,7 @@ export function RecentScans({ scans, onSelectScan, isLoading }: RecentScansProps
         <ScrollArea className="w-full whitespace-nowrap rounded-md pb-4">
           <div className="flex w-max space-x-4 p-1">
             {scans.map((scan) => (
-              <div key={scan.id} className="overflow-hidden rounded-xl border border-primary/30 w-60 shrink-0 group transition-all hover:shadow-glow-cyan bg-black/20 hover:border-primary">
+              <div key={scan.id} className="overflow-hidden rounded-xl border border-primary/30 w-60 shrink-0 group transition-all hover:shadow-glow-primary bg-card hover:border-primary">
                 <div className="relative aspect-video bg-muted/20">
                   <NextImage
                     src={scan.previewUrl}
@@ -48,27 +48,27 @@ export function RecentScans({ scans, onSelectScan, isLoading }: RecentScansProps
                     className="group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint="thumbnail scan"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
                    <div className="absolute bottom-2 left-2 right-2">
                     {scan.isAiGenerated ? (
                       <span className="text-xs font-semibold text-destructive-foreground bg-destructive/90 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
                         <CpuIcon size={14} /> A.I. Generated
                       </span>
                     ) : (
-                      <span className="text-xs font-semibold text-primary-foreground bg-primary/90 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
+                      <span className="text-xs font-semibold text-success-foreground bg-success/90 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
                         <CheckCircle2Icon size={14} /> Likely Real
                       </span>
                     )}
                    </div>
                 </div>
-                <div className="p-3 bg-card/50">
+                <div className="p-3 bg-card/80">
                   <p className="text-xs text-muted-foreground mb-2 truncate">
                     {new Date(scan.timestamp).toLocaleString()}
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full futuristic-button !text-sm !py-2 !bg-secondary/70 hover:!bg-primary hover:!text-primary-foreground"
+                    className="w-full app-button !text-sm !py-2 !bg-secondary hover:!bg-primary hover:!text-primary-foreground"
                     onClick={() => onSelectScan(scan)}
                     aria-label={`View details for scan from ${new Date(scan.timestamp).toLocaleString()}`}
                   >

@@ -8,9 +8,11 @@ import { ResultDisplay } from "@/components/veritylens/ResultDisplay";
 import { RecentScans } from "@/components/veritylens/RecentScans";
 import { UserInsights } from "@/components/veritylens/UserInsights";
 import { LoadingSpinner } from "@/components/veritylens/LoadingSpinner";
+import { UpgradeModal } from "@/components/veritylens/UpgradeModal";
+import { AdBanner } from "@/components/veritylens/AdBanner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, PenToolIcon } from "lucide-react";
+import { AlertTriangle, PenToolIcon, Settings2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { analyzeImage } from "@/ai/flows/analyze-image";
@@ -18,8 +20,9 @@ import type { AnalyzeImageOutput } from "@/ai/flows/analyze-image";
 import { getUsageInsights } from "@/ai/flows/get-usage-insights";
 
 import type { ScanResult, UploadHistoryItem } from "@/types";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
-const MOCK_USER_ID = "user123";
+const MOCK_USER_ID = "user123"; // Replace with actual user ID from auth
 
 export default function VerityLensPage() {
   const [analysisResult, setAnalysisResult] = useState<ScanResult | null>(null);
@@ -29,9 +32,10 @@ export default function VerityLensPage() {
   const [recentScans, setRecentScans] = useState<ScanResult[]>([]);
   const [userInsights, setUserInsights] = useState<string | null>(null);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
-
+  
   const { toast } = useToast();
   const resultSectionRef = useRef<HTMLDivElement>(null);
+  const { subscriptionStatus, incrementScanCount, isUpgradeModalOpen, setIsUpgradeModalOpen, canScan, showUpgradeModal } = useSubscription();
 
 
   const toDataURL = (data: File | Blob): Promise<string> =>
@@ -43,6 +47,16 @@ export default function VerityLensPage() {
     });
 
   const handleAnalyze = async (data: { file?: File; url?: string }, type: 'file' | 'url') => {
+    if (!canScan()) {
+      showUpgradeModal();
+      toast({
+        variant: "destructive",
+        title: "Scan Limit Reached",
+        description: "Upgrade to Premium for unlimited scans.",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setAnalysisResult(null); 
@@ -54,9 +68,7 @@ export default function VerityLensPage() {
 
     try {
       if (data.file) {
-        if (data.file.name === 'camera_image.jpg' || type === 'file' && data.file.lastModified < Date.now() - 1000 * 60 ) { // Heuristic: if file is very recent, might be camera
-             sourceType = data.file.name.startsWith("camera_") ? 'camera' : 'upload'; // More specific check if possible
-        }
+        sourceType = data.file.name.startsWith("camera_") ? 'camera' : 'upload';
         photoDataUri = await toDataURL(data.file);
         previewUrl = photoDataUri; 
         originalImageUrl = `localfile:${data.file.name}`; 
@@ -77,6 +89,7 @@ export default function VerityLensPage() {
       }
 
       const aiResult: AnalyzeImageOutput = await analyzeImage({ photoDataUri });
+      incrementScanCount(); // Increment scan count on successful analysis call
 
       const newScan: ScanResult = {
         ...aiResult,
@@ -91,15 +104,26 @@ export default function VerityLensPage() {
       setAnalysisResult(newScan);
       setRecentScans(prevScans => [newScan, ...prevScans].slice(0, 10)); 
       
-      // Scroll to result section after a short delay to allow rendering
       setTimeout(() => {
         resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
 
-
     } catch (err: any) {
       console.error("Analysis error:", err);
-      const errorMessage = err.message || "An unexpected error occurred during analysis.";
+      let errorMessage = "An unexpected error occurred during analysis.";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      // Check for specific Genkit/API errors if possible
+      if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('limit')) {
+        errorMessage = "The analysis service is currently busy or quota has been exceeded. Please try again later.";
+      } else if (errorMessage.toLowerCase().includes('unsafe content') || errorMessage.toLowerCase().includes('blocked')) {
+        errorMessage = "Image analysis was blocked due to content policy. Please try a different image.";
+      }
+
       setError(errorMessage);
       toast({
         variant: "destructive",
@@ -128,10 +152,15 @@ export default function VerityLensPage() {
     } catch (err: any)      {
       console.error("Error fetching insights:", err);
       setUserInsights("Could not load insights at this time.");
+       toast({
+        variant: "destructive",
+        title: "Insights Error",
+        description: "Failed to fetch usage insights.",
+      });
     } finally {
       setIsLoadingInsights(false);
     }
-  }, [recentScans]);
+  }, [recentScans, toast]); // Added toast to dependencies
 
   useEffect(() => {
     if (recentScans.length > 0) {
@@ -144,6 +173,15 @@ export default function VerityLensPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-grow container mx-auto px-5 py-4 md:py-6 space-y-10 md:space-y-12">
+        
+        {/* Placeholder for subscription status - to be developed further */}
+        {/* <div className="text-center p-2 bg-accent/20 rounded-md">
+          <p className="text-sm text-accent-foreground">
+            Current Plan: <span className="font-semibold capitalize">{subscriptionStatus}</span>.
+            {subscriptionStatus === 'free' && ` Scans today: ${dailyScansToday()}/${FREE_SCAN_LIMIT_PER_DAY}.`}
+          </p>
+        </div> */}
+
         <section aria-labelledby="image-upload-heading">
           <h2 id="image-upload-heading" className="sr-only">Verify Your Image</h2>
           <ImageUploader onAnalyze={handleAnalyze} isLoading={isLoading} />
@@ -181,22 +219,37 @@ export default function VerityLensPage() {
           <UserInsights insights={userInsights} isLoading={isLoadingInsights} />
         </section>
         
-        <section aria-labelledby="extra-features-heading" className="pt-4">
+        {/* Settings/Push Notification Placeholder */}
+        <section aria-labelledby="settings-heading" className="pt-4">
+          <h2 id="settings-heading" className="sr-only">Settings</h2>
+           <Button
+              variant="outline"
+              className="w-full app-button bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90"
+              onClick={() => toast({ title: "Settings", description: "App settings and push notification preferences would be here."})}
+            >
+              <Settings2 className="mr-2" />
+              APP SETTINGS & NOTIFICATIONS
+            </Button>
+        </section>
+
+        <section aria-labelledby="extra-features-heading" className="pt-2">
             <h2 id="extra-features-heading" className="sr-only">Extra Features</h2>
             <Button
               variant="outline"
-              className="futuristic-button border-dashed border-primary/50 text-primary/70 hover:bg-secondary/50 hover:text-primary hover:border-primary"
+              className="w-full app-button border-dashed border-primary/50 !bg-transparent !text-primary hover:!bg-primary/10"
               disabled={true}
             >
               <PenToolIcon className="mr-2" />
-              EXTRA (COMING SOON)
+              EXTRA FEATURES (COMING SOON)
             </Button>
         </section>
 
       </main>
+      {subscriptionStatus === 'free' && <AdBanner />}
       <footer className="py-8 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} VerityLens. AI Lab Division.
       </footer>
+      <UpgradeModal isOpen={isUpgradeModalOpen} onClose={() => setIsUpgradeModalOpen(false)} />
     </div>
   );
 }
