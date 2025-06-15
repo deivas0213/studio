@@ -25,12 +25,12 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const { toast } = useToast();
   const { setSubscriptionStatus } = useSubscription(); 
 
-  const handleUpgrade = (plan: string) => {
+  const handleUpgrade = (plan: string, planName: string) => {
     setSubscriptionStatus('premium'); 
     toast({
       title: "VIP Access Unlocked! (Mock)",
-      description: `You've been upgraded to ${plan}! Enjoy unlimited scans and all VIP features.`,
-      variant: "default", // Or a 'success' variant if you have one
+      description: `You've been upgraded to ${planName}! Enjoy unlimited scans and all VIP features.`,
+      variant: "default",
     });
     onClose(); 
   };
@@ -53,16 +53,16 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
         <div className="space-y-4 my-6 px-2">
             <Button 
               className="w-full app-button text-base py-3"
-              onClick={() => handleUpgrade("Monthly VIP Plan")}
+              onClick={() => handleUpgrade("Monthly VIP Plan", "Monthly VIP ($9.99/mo)")}
             >
-              <Zap className="mr-2 h-5 w-5" /> Go VIP - Monthly Plan
+              <Zap className="mr-2 h-5 w-5" /> Go VIP - $9.99/month
             </Button>
             <Button 
               variant="outline"
               className="w-full app-button !bg-secondary !text-secondary-foreground !border-secondary hover:!bg-opacity-80 text-base py-3"
-              onClick={() => handleUpgrade("Annual VIP Plan (Best Value)")}
+              onClick={() => handleUpgrade("Annual VIP Plan (Best Value)", "Annual VIP ($79.99/yr - Save 20%)")}
             >
-              <Gem className="mr-2 h-5 w-5" /> Go VIP - Annual Plan (Save 20%)
+              <Gem className="mr-2 h-5 w-5" /> Go VIP - $79.99/year (Save 20%)
             </Button>
         </div>
 
@@ -87,3 +87,4 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
     </AlertDialog>
   );
 }
+
