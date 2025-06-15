@@ -9,10 +9,11 @@ import { RecentScans } from "@/components/veritylens/RecentScans";
 import { UserInsights } from "@/components/veritylens/UserInsights";
 import { LoadingSpinner } from "@/components/veritylens/LoadingSpinner";
 import { UpgradeModal } from "@/components/veritylens/UpgradeModal";
+import { VipFeaturesDisplay } from "@/components/veritylens/VipFeaturesDisplay";
 import { AdBanner } from "@/components/veritylens/AdBanner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, PenToolIcon, Settings2 } from "lucide-react";
+import { AlertTriangle, Settings2, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { analyzeImage } from "@/ai/flows/analyze-image";
@@ -39,7 +40,15 @@ export default function VerityLensPage() {
   
   const { toast } = useToast();
   const resultSectionRef = useRef<HTMLDivElement>(null);
-  const { subscriptionStatus, incrementScanCount, isUpgradeModalOpen, setIsUpgradeModalOpen, canScan, showUpgradeModal } = useSubscription();
+  const { 
+    subscriptionStatus, 
+    incrementScanCount, 
+    isUpgradeModalOpen, 
+    setIsUpgradeModalOpen, 
+    canScan, 
+    showUpgradeModal,
+    isPremium 
+  } = useSubscription();
 
 
   const toDataURL = (data: File | Blob): Promise<string> =>
@@ -56,7 +65,7 @@ export default function VerityLensPage() {
       toast({
         variant: "destructive",
         title: "Scan Limit Reached",
-        description: "Upgrade to Premium for unlimited scans.",
+        description: "Upgrade to VIP for unlimited scans.",
       });
       return;
     }
@@ -214,6 +223,22 @@ export default function VerityLensPage() {
           <UserInsights insights={userInsights} isLoading={isLoadingInsights} />
         </section>
         
+        <section aria-labelledby="vip-features-heading" className="pt-2">
+          <h2 id="vip-features-heading" className="sr-only">VIP Features</h2>
+          {isPremium() ? (
+            <VipFeaturesDisplay />
+          ) : (
+            <Button
+              variant="outline"
+              className="w-full app-button border-dashed border-primary/50 !bg-transparent !text-primary hover:!bg-primary/10 dark:!text-primary dark:hover:!bg-primary/10"
+              onClick={showUpgradeModal}
+            >
+              <Star className="mr-2" />
+              UNLOCK VIP FEATURES
+            </Button>
+          )}
+        </section>
+        
         <section aria-labelledby="settings-heading" className="pt-4">
           <h2 id="settings-heading" className="sr-only">Settings</h2>
           <Sheet open={isSettingsSheetOpen} onOpenChange={setIsSettingsSheetOpen}>
@@ -247,17 +272,6 @@ export default function VerityLensPage() {
           </Sheet>
         </section>
 
-        <section aria-labelledby="extra-features-heading" className="pt-2">
-            <h2 id="extra-features-heading" className="sr-only">Extra Features</h2>
-            <Button
-              variant="outline"
-              className="w-full app-button border-dashed border-primary/50 !bg-transparent !text-primary hover:!bg-primary/10"
-              disabled={true}
-            >
-              <PenToolIcon className="mr-2" />
-              EXTRA FEATURES (COMING SOON)
-            </Button>
-        </section>
 
       </main>
       {subscriptionStatus === 'free' && <AdBanner />}

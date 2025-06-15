@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -16,6 +17,7 @@ interface SubscriptionContextType {
   canScan: () => boolean;
   showUpgradeModal: () => void;
   dailyScansToday: () => number;
+  isPremium: () => boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -59,6 +61,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
 
   const incrementScanCount = useCallback(() => {
+    if (subscriptionStatus === 'premium') return; // Premium users don't increment scan counts
+
     const today = new Date().toLocaleDateString();
     if (lastScanDate !== today) { // If it's a new day, reset scans first
       setDailyScans(1);
@@ -66,7 +70,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } else {
       setDailyScans(prev => prev + 1);
     }
-  }, [lastScanDate]);
+  }, [lastScanDate, subscriptionStatus]);
 
   const resetDailyScans = useCallback(() => {
     const today = new Date().toLocaleDateString();
@@ -89,10 +93,15 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   const dailyScansToday = useCallback(() => {
+    if (subscriptionStatus === 'premium') return 0; // Or indicate unlimited based on UI needs
     const today = new Date().toLocaleDateString();
     if (lastScanDate !== today) return 0;
     return dailyScans;
-  }, [dailyScans, lastScanDate]);
+  }, [dailyScans, lastScanDate, subscriptionStatus]);
+
+  const isPremium = useCallback(() => {
+    return subscriptionStatus === 'premium';
+  }, [subscriptionStatus]);
 
   return (
     <SubscriptionContext.Provider value={{ 
@@ -105,7 +114,8 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsUpgradeModalOpen,
       canScan,
       showUpgradeModal,
-      dailyScansToday
+      dailyScansToday,
+      isPremium
     }}>
       {children}
     </SubscriptionContext.Provider>
@@ -119,3 +129,4 @@ export const useSubscription = (): SubscriptionContextType => {
   }
   return context;
 };
+
