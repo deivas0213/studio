@@ -25,7 +25,7 @@ export default function RootLayout({
         
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" /> {/* Default dark theme, can be dynamic via ThemeContext later if needed */}
+        <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href="https://placehold.co/180x180.png" data-ai-hint="app icon" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
