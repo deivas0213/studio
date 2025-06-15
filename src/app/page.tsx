@@ -22,7 +22,10 @@ import { getUsageInsights } from "@/ai/flows/get-usage-insights";
 import type { ScanResult, UploadHistoryItem } from "@/types";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
-const MOCK_USER_ID = "user123"; // Replace with actual user ID from auth
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
+import { ThemeSwitcher } from "@/components/veritylens/ThemeSwitcher";
+
+const MOCK_USER_ID = "user123"; 
 
 export default function VerityLensPage() {
   const [analysisResult, setAnalysisResult] = useState<ScanResult | null>(null);
@@ -32,6 +35,7 @@ export default function VerityLensPage() {
   const [recentScans, setRecentScans] = useState<ScanResult[]>([]);
   const [userInsights, setUserInsights] = useState<string | null>(null);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
+  const [isSettingsSheetOpen, setIsSettingsSheetOpen] = useState(false);
   
   const { toast } = useToast();
   const resultSectionRef = useRef<HTMLDivElement>(null);
@@ -89,7 +93,7 @@ export default function VerityLensPage() {
       }
 
       const aiResult: AnalyzeImageOutput = await analyzeImage({ photoDataUri });
-      incrementScanCount(); // Increment scan count on successful analysis call
+      incrementScanCount(); 
 
       const newScan: ScanResult = {
         ...aiResult,
@@ -117,7 +121,6 @@ export default function VerityLensPage() {
         errorMessage = err;
       }
       
-      // Check for specific Genkit/API errors if possible
       if (errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('limit')) {
         errorMessage = "The analysis service is currently busy or quota has been exceeded. Please try again later.";
       } else if (errorMessage.toLowerCase().includes('unsafe content') || errorMessage.toLowerCase().includes('blocked')) {
@@ -160,7 +163,7 @@ export default function VerityLensPage() {
     } finally {
       setIsLoadingInsights(false);
     }
-  }, [recentScans, toast]); // Added toast to dependencies
+  }, [recentScans, toast]); 
 
   useEffect(() => {
     if (recentScans.length > 0) {
@@ -174,14 +177,6 @@ export default function VerityLensPage() {
       <AppHeader />
       <main className="flex-grow container mx-auto px-5 py-4 md:py-6 space-y-10 md:space-y-12">
         
-        {/* Placeholder for subscription status - to be developed further */}
-        {/* <div className="text-center p-2 bg-accent/20 rounded-md">
-          <p className="text-sm text-accent-foreground">
-            Current Plan: <span className="font-semibold capitalize">{subscriptionStatus}</span>.
-            {subscriptionStatus === 'free' && ` Scans today: ${dailyScansToday()}/${FREE_SCAN_LIMIT_PER_DAY}.`}
-          </p>
-        </div> */}
-
         <section aria-labelledby="image-upload-heading">
           <h2 id="image-upload-heading" className="sr-only">Verify Your Image</h2>
           <ImageUploader onAnalyze={handleAnalyze} isLoading={isLoading} />
@@ -219,17 +214,37 @@ export default function VerityLensPage() {
           <UserInsights insights={userInsights} isLoading={isLoadingInsights} />
         </section>
         
-        {/* Settings/Push Notification Placeholder */}
         <section aria-labelledby="settings-heading" className="pt-4">
           <h2 id="settings-heading" className="sr-only">Settings</h2>
-           <Button
-              variant="outline"
-              className="w-full app-button bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90"
-              onClick={() => toast({ title: "Settings", description: "App settings and push notification preferences would be here."})}
-            >
-              <Settings2 className="mr-2" />
-              APP SETTINGS & NOTIFICATIONS
-            </Button>
+          <Sheet open={isSettingsSheetOpen} onOpenChange={setIsSettingsSheetOpen}>
+            <SheetTrigger asChild>
+               <Button
+                  variant="outline"
+                  className="w-full app-button bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90"
+                >
+                  <Settings2 className="mr-2" />
+                  APP SETTINGS & NOTIFICATIONS
+                </Button>
+            </SheetTrigger>
+            <SheetContent className="bg-card text-card-foreground border-border">
+              <SheetHeader className="mb-6">
+                <SheetTitle className="text-xl font-bold text-primary">App Settings</SheetTitle>
+                <SheetDescription className="text-muted-foreground">
+                  Customize your app experience.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="space-y-6">
+                <ThemeSwitcher />
+                {/* Placeholder for notification settings */}
+                <div>
+                  <h3 className="text-md font-semibold text-foreground mb-2">Notifications</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Notification preferences would be configured here. (Feature coming soon)
+                  </p>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </section>
 
         <section aria-labelledby="extra-features-heading" className="pt-2">

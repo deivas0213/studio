@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,6 +61,7 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
         setFilePreview(URL.createObjectURL(file));
         setFileName(file.name);
       } else {
+        // Using toast for errors is better than alert, but alert is simpler for now.
         alert(validationResult.error.errors.map(e => e.message).join('\n'));
         setFilePreview(null);
         setFileName(null);
@@ -115,6 +117,9 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
     setUrlValue("imageUrl", "");
   };
 
+  // Buttons are now full-width using `app-button` from globals.css
+  // Dark teal background (#011a1f) with cyan border/text will be applied in dark mode
+  // via CSS variables. Light mode will use primary button styling.
   const commonButtonClass = "app-button text-lg py-3.5";
   const commonInputClass = "app-input h-12 text-base file:font-semibold file:border-0 file:bg-transparent file:text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg hover:file:bg-primary/10";
 
@@ -136,14 +141,14 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
           clearAllInputs();
         }}>
           <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted p-1 rounded-lg">
-            <TabsTrigger value="gallery" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
-              <ImageIcon className="mr-2" />GALLERY
+            <TabsTrigger value="gallery" className="py-2.5 text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <ImageIcon className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5" />GALLERY
             </TabsTrigger>
-            <TabsTrigger value="camera" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
-              <CameraIcon className="mr-2" />CAMERA
+            <TabsTrigger value="camera" className="py-2.5 text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <CameraIcon className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5" />CAMERA
             </TabsTrigger>
-            <TabsTrigger value="url" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
-              <Link2Icon className="mr-2" />LINK
+            <TabsTrigger value="url" className="py-2.5 text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <Link2Icon className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5" />LINK
             </TabsTrigger>
           </TabsList>
 
@@ -159,7 +164,14 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
               <div className="space-y-4">
                 <Label htmlFor="gallery-file" className="sr-only">Select from Gallery</Label>
                 <Input id="gallery-file" type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className={commonInputClass} />
-                <Button onClick={onAnalyzeFile} disabled={isLoading || !filePreview} className={commonButtonClass}>
+                {/* Button class is 'app-button'. It will use primary colors in light mode. 
+                    In dark mode, it will use --secondary for bg and --primary for text/border (dark teal/cyan).
+                    We'll ensure .dark .app-button in globals.css handles the dark teal variant. */}
+                <Button 
+                  onClick={onAnalyzeFile} 
+                  disabled={isLoading || !filePreview} 
+                  className={`${commonButtonClass} dark:bg-secondary dark:text-primary dark:border-primary dark:hover:bg-secondary/80`}
+                >
                   {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM GALLERY
                 </Button>
               </div>
@@ -169,7 +181,11 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
               <div className="space-y-4">
                 <Label htmlFor="camera-file" className="sr-only">Use Camera</Label>
                 <Input id="camera-file" type="file" accept="image/*" capture="environment" onChange={handleFileChange} ref={cameraInputRef} className={commonInputClass} />
-                 <Button onClick={onAnalyzeFile} disabled={isLoading || !filePreview} className={commonButtonClass}>
+                 <Button 
+                  onClick={onAnalyzeFile} 
+                  disabled={isLoading || !filePreview} 
+                  className={`${commonButtonClass} dark:bg-secondary dark:text-primary dark:border-primary dark:hover:bg-secondary/80`}
+                >
                   {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM CAMERA
                 </Button>
               </div>
@@ -182,11 +198,15 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
                   <Controller
                     name="imageUrl"
                     control={urlControl}
-                    render={({ field }) => <Input id="imageUrl" type="url" placeholder="Paste image link here..." {...field} className={`${commonInputClass} placeholder-muted-foreground/70`} />}
+                    render={({ field }) => <Input id="imageUrl" type="url" placeholder="Paste image link here..." {...field} className={`${commonInputClass} placeholder-muted-foreground/70 dark:placeholder-muted-foreground/50`} />}
                   />
                   {urlErrors.imageUrl && <p className="text-sm text-destructive mt-2 px-1">{urlErrors.imageUrl.message}</p>}
                 </div>
-                <Button type="submit" disabled={isLoading} className={commonButtonClass}>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading} 
+                  className={`${commonButtonClass} dark:bg-secondary dark:text-primary dark:border-primary dark:hover:bg-secondary/80`}
+                >
                   {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM LINK
                 </Button>
               </form>

@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +9,7 @@ body {
 
 @layer base {
   :root {
+    /* Light Theme (default as per previous PRD, but will be overridden by dark if needed) */
     --background: 0 0% 94%; /* Light Gray #F0F0F0 */
     --foreground: 0 0% 13%; /* Dark Gray for text #212121 */
 
@@ -42,51 +44,93 @@ body {
     
     --radius: 0.75rem; /* 12px, for general rounded corners (10-15px range) */
 
-    /* HSL components for box-shadows */
-    --primary-h: 197;
-    --primary-s: 71%;
-    --primary-l: 52%;
-    --destructive-h: 0;
-    --destructive-s: 80%;
-    --destructive-l: 60%;
-    --success-h: 197; /* Same as primary for "REAL" indication */
-    --success-s: 71%;
-    --success-l: 52%;
+    /* HSL components for box-shadows (Light Theme) */
+    --primary-h: 197; --primary-s: 71%; --primary-l: 52%;
+    --destructive-h: 0; --destructive-s: 80%; --destructive-l: 60%;
+    --success-h: 197; --success-s: 71%; --success-l: 52%;
     
     --chart-1: 197 71% 52%;
     --chart-2: 210 71% 52%;
     --chart-3: 45 100% 85%;
     --chart-4: 270 71% 52%;
     --chart-5: 300 71% 52%;
+
+    /* Glow effect variables - Light theme values */
+    --glow-opacity-1: 0.25;
+    --glow-opacity-2: 0.15;
+    --glow-opacity-3: 0.35;
+    --glow-opacity-4: 0.20;
+    --glow-blur-1: 8px;
+    --glow-spread-1: 2px;
+    --glow-blur-2: 15px;
+    --glow-spread-2: 3px;
+    --glow-blur-3: 12px;
+    --glow-spread-3: 4px;
+    --glow-blur-4: 25px;
+    --glow-spread-4: 6px;
   }
 
-  /* Dark mode can be defined here if a toggle is added later */
-  /*
   .dark {
-    --background: 0 0% 10%; 
-    --foreground: 0 0% 90%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 90%;
-    --primary: 197 71% 58%; 
-    --primary-foreground: 0 0% 10%; 
-    --secondary: 197 65% 50%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 25%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 45 90% 75%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 90%;
-    --success: 197 71% 58%;
-    --success-foreground: 0 0% 10%;
-    --border: 0 0% 30%;
-    --input-border: 0 0% 40%;
-    --input: 0 0% 20%;
-    --ring: 197 71% 68%;
+    /* Dark Theme - "CHECK A.I." branding with pure black background */
+    --background: 0 0% 0%; /* Pure Black #000000 */
+    --foreground: 0 0% 95%; /* Light Gray / Off-white for text #F2F2F2 */
+
+    --card: 0 0% 7%; /* Very Dark Gray for card backgrounds #121212 (was #111111) */
+    --card-foreground: 0 0% 95%; /* Light Gray for text on cards */
+
+    --popover: 0 0% 7%; /* Very Dark Gray */
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 180 100% 50%; /* Cyan #00FFFF */
+    --primary-foreground: 0 0% 5%; /* Black/Very Dark for text on cyan buttons */
+    
+    /* Using dark teal for secondary buttons as per original "CHECK A.I." prompt */
+    --secondary: 190 95% 6%; /* Dark Teal #011a1f */
+    --secondary-foreground: 180 100% 50%; /* Cyan text on dark teal */
+
+    --muted: 0 0% 15%; /* Darker Gray for muted elements #262626 */
+    --muted-foreground: 0 0% 55%; /* Medium Gray for muted text #8C8C8C */
+
+    /* Accent could be a contrasting color or a subtle one */
+    --accent: 180 100% 50%; /* Cyan as accent */
+    --accent-foreground: 0 0% 5%; /* Black/Very Dark for text on accent */
+
+    --destructive: 0 100% 65%; /* Red #FF4C4C (kept from previous dark variant) */
+    --destructive-foreground: 0 0% 95%; /* White */
+    
+    --success: 180 100% 50%; /* Cyan for REAL indication */
+    --success-foreground: 0 0% 5%; /* Black/Very Dark for text on success */
+
+    --border: 180 50% 30%; /* Cyan-ish border, less saturated #267F7F (was 0 0% 20% #333333) */
+    --input-border: 180 60% 40%; /* Brighter Cyan-ish for input borders #3CCBCB */
+    --input: 0 0% 10%; /* Dark background for inputs #1A1A1A */
+    --ring: 180 100% 60%; /* Brighter Cyan for focus rings */
+    
+    /* HSL components for box-shadows (Dark Theme) */
+    --primary-h: 180; --primary-s: 100%; --primary-l: 50%; /* Cyan */
+    --destructive-h: 0; --destructive-s: 100%; --destructive-l: 65%; /* Red */
+    --success-h: 180; --success-s: 100%; --success-l: 50%; /* Cyan */
+
+    --chart-1: 180 100% 50%;
+    --chart-2: 210 100% 50%;
+    --chart-3: 45 100% 60%;
+    --chart-4: 270 100% 60%;
+    --chart-5: 300 100% 60%;
+
+    /* Glow effect variables - Dark theme values (more intense) */
+    --glow-opacity-1: 0.5;
+    --glow-opacity-2: 0.3;
+    --glow-opacity-3: 0.7;
+    --glow-opacity-4: 0.45;
+    --glow-blur-1: 10px;
+    --glow-spread-1: 3px;
+    --glow-blur-2: 20px;
+    --glow-spread-2: 5px;
+    --glow-blur-3: 15px;
+    --glow-spread-3: 5px;
+    --glow-blur-4: 30px;
+    --glow-spread-4: 8px;
   }
-  */
 }
 
 @layer base {
@@ -100,15 +144,15 @@ body {
   }
 }
 
-/* Custom glow effects adapted for light theme (more like a colored shadow) */
+/* Custom glow effects using CSS variables for theme-dependent intensity */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 8px 2px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.25),
-                0 0 15px 3px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.15);
+    box-shadow: 0 0 var(--glow-blur-1) var(--glow-spread-1) hsla(var(--glow-h, var(--primary-h)), var(--glow-s, var(--primary-s)), var(--glow-l, var(--primary-l)), var(--glow-opacity-1)),
+                0 0 var(--glow-blur-2) var(--glow-spread-2) hsla(var(--glow-h, var(--primary-h)), var(--glow-s, var(--primary-s)), var(--glow-l, var(--primary-l)), var(--glow-opacity-2));
   }
   50% {
-    box-shadow: 0 0 12px 4px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.35),
-                0 0 25px 6px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.2);
+    box-shadow: 0 0 var(--glow-blur-3) var(--glow-spread-3) hsla(var(--glow-h, var(--primary-h)), var(--glow-s, var(--primary-s)), var(--glow-l, var(--primary-l)), var(--glow-opacity-3)),
+                0 0 var(--glow-blur-4) var(--glow-spread-4) hsla(var(--glow-h, var(--primary-h)), var(--glow-s, var(--primary-s)), var(--glow-l, var(--primary-l)), var(--glow-opacity-4));
   }
 }
 
@@ -121,17 +165,21 @@ body {
 }
 
 .glow-real {
-  --glow-h: var(--primary-h);
-  --glow-s: var(--primary-s);
-  --glow-l: var(--primary-l);
-  border-color: hsl(var(--primary));
+  --glow-h: var(--success-h); 
+  --glow-s: var(--success-s);
+  --glow-l: var(--success-l);
+  border-color: hsl(var(--success));
   animation: pulse-glow 2.5s infinite ease-in-out;
 }
 
-/* App-specific button style based on user prompt for new theme */
+/* App-specific button style for main actions */
 .app-button {
   @apply w-full rounded-lg border border-primary bg-primary py-3 px-4 text-lg font-bold text-primary-foreground transition-all duration-300 hover:bg-opacity-90 hover:shadow-[0_0_15px_hsl(var(--primary-h),var(--primary-s),var(--primary-l),0.4)];
 }
+.dark .app-button { /* Ensure dark mode styling for app-button if it deviates */
+  @apply border-primary bg-secondary text-primary hover:bg-secondary/90 hover:shadow-[0_0_20px_hsl(var(--primary-h),var(--primary-s),var(--primary-l),0.6)];
+}
+
 
 .app-input {
   @apply bg-input text-foreground placeholder-muted-foreground border-input-border focus:ring-primary focus:border-primary;

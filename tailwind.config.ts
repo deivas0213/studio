@@ -1,7 +1,8 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
-  darkMode: ['class'], // Keep dark mode selector available if a toggle is added later
+  darkMode: 'class', // Ensure dark mode is enabled via class
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -33,8 +34,8 @@ export default {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))', // Strong Blue
-          foreground: 'hsl(var(--primary-foreground))', // White
+          DEFAULT: 'hsl(var(--primary))', 
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))', 
@@ -45,21 +46,21 @@ export default {
           foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))', // Soft Yellow
+          DEFAULT: 'hsl(var(--accent))', 
           foreground: 'hsl(var(--accent-foreground))', 
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))', // AI Red
+          DEFAULT: 'hsl(var(--destructive))', 
           foreground: 'hsl(var(--destructive-foreground))', 
         },
         success: { 
-          DEFAULT: 'hsl(var(--success))', // Strong Blue (for REAL)
+          DEFAULT: 'hsl(var(--success))', 
           foreground: 'hsl(var(--success-foreground))', 
         },
         border: 'hsl(var(--border))', 
         input: {
           DEFAULT: 'hsl(var(--input))',
-          border: 'hsl(var(--input-border))',
+          border: 'hsl(var(--input-border))', // Renamed from 'input-border' for clarity
         },
         ring: 'hsl(var(--ring))', 
       },
@@ -72,7 +73,7 @@ export default {
         '20px': '20px', // Custom 20px
       },
       fontSize: {
-        '4.5xl': ['2.25rem', { lineHeight: '2.5rem' }], // Tailwind's 4xl is 2.25rem, 36pt is approx 2.25rem
+        '4.5xl': ['2.25rem', { lineHeight: '2.5rem' }], 
       },
       keyframes: {
         'accordion-down': {
@@ -95,24 +96,20 @@ export default {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        "pulse-glow-keyframe": { 
-          '0%, 100%': {
-            boxShadow: '0 0 8px 2px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.25), 0 0 15px 3px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.15)',
-          },
-          '50%': {
-            boxShadow: '0 0 12px 4px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.35), 0 0 25px 6px hsla(var(--glow-h, 0), var(--glow-s, 0%), var(--glow-l, 0%), 0.2)',
-          },
-        },
+        // pulse-glow keyframe will be handled by globals.css for light/dark variants
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         "fadeIn": "fadeIn 0.5s ease-out forwards",
-        "pulse-glow": "pulse-glow-keyframe 2.5s infinite ease-in-out",
+        "pulse-glow": "pulse-glow 2.5s infinite ease-in-out", // References @keyframes pulse-glow from globals.css
       },
-      boxShadow: { // Adjusted for light theme
-        'glow-primary': '0 0 8px 2px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.3), 0 0 16px 4px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.15)',
-        'glow-destructive': '0 0 8px 2px hsla(var(--destructive-h), var(--destructive-s), var(--destructive-l), 0.3), 0 0 16px 4px hsla(var(--destructive-h), var(--destructive-s), var(--destructive-l), 0.15)',
+      boxShadow: { // General shadows, glow is specific
+        'glow-primary': '0 0 8px 2px hsla(var(--primary-h,0), var(--primary-s,0%), var(--primary-l,0%), 0.3), 0 0 16px 4px hsla(var(--primary-h,0), var(--primary-s,0%), var(--primary-l,0%), 0.15)',
+        'glow-destructive': '0 0 8px 2px hsla(var(--destructive-h,0), var(--destructive-s,0%), var(--destructive-l,0%), 0.3), 0 0 16px 4px hsla(var(--destructive-h,0), var(--destructive-s,0%), var(--destructive-l,0%), 0.15)',
+         // Dark mode specific glows might be more intense, primarily controlled via globals.css with HSL variables
+        'dark-glow-primary': '0 0 10px 3px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.5), 0 0 20px 5px hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.3)',
+        'dark-glow-destructive': '0 0 10px 3px hsla(var(--destructive-h), var(--destructive-s), var(--destructive-l), 0.5), 0 0 20px 5px hsla(var(--destructive-h), var(--destructive-s), var(--destructive-l), 0.3)',
       }
     },
   },
