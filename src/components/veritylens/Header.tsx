@@ -7,14 +7,14 @@ export function AppHeader() {
       <div className="container mx-auto flex items-center justify-center space-x-3">
         <NextImage
           src="https://placehold.co/50x50.png"
-          alt="VerityLens Logo"
+          alt="Unmask AI Logo"
           width={50}
           height={50}
           className="rounded-md"
           data-ai-hint="app logo"
         />
         <h1 className="text-4.5xl font-black text-primary tracking-wider uppercase">
-          Check <span className="text-foreground">A.I.</span>
+          Unmask <span className="text-foreground">AI</span>
         </h1>
       </div>
     </header>

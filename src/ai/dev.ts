@@ -18,4 +18,4 @@ config(); // Ensures .env variables are loaded for the standalone Genkit process
 // import '@/ai/flows/get-usage-insights.ts';
 // import '@/ai/flows/analyze-image.ts';
 
-console.log('[VerityLens - src/ai/dev.ts] Genkit dev helper script initialized. Flows are primarily loaded via Next.js direct imports.');
+console.log('[Unmask AI - src/ai/dev.ts] Genkit dev helper script initialized. Flows are primarily loaded via Next.js direct imports.');

@@ -276,7 +276,7 @@ export default function VerityLensPage() {
       </main>
       {subscriptionStatus === 'free' && <AdBanner />}
       <footer className="py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} VerityLens. AI Lab Division.
+        © {new Date().getFullYear()} Unmask AI.
       </footer>
       <UpgradeModal isOpen={isUpgradeModalOpen} onClose={() => setIsUpgradeModalOpen(false)} />
     </div>
