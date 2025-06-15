@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Zap, Gem, X } from "lucide-react"; // Gem for premium
+import { useSubscription } from "@/contexts/SubscriptionContext"; // Import useSubscription
+import { Zap, Gem, X } from "lucide-react";
 
 type UpgradeModalProps = {
   isOpen: boolean;
@@ -21,11 +23,13 @@ type UpgradeModalProps = {
 
 export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const { toast } = useToast();
+  const { setSubscriptionStatus } = useSubscription(); // Get setSubscriptionStatus
 
   const handleUpgrade = (plan: string) => {
+    setSubscriptionStatus('premium'); // Set status to premium
     toast({
-      title: "Upgrade Initiated (Mock)",
-      description: `You've selected the ${plan} plan. Actual IAP flow would start here.`,
+      title: "Upgrade Successful (Mock)",
+      description: `You've been upgraded to the ${plan} plan! Enjoy unlimited scans.`,
     });
     onClose(); 
   };
