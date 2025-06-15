@@ -11,19 +11,19 @@ type UserInsightsProps = {
 
 export function UserInsights({ insights, isLoading }: UserInsightsProps) {
   return (
-    <Card className="shadow-md">
+    <Card className="bg-card text-card-foreground shadow-lg rounded-20px border-0">
       <CardHeader>
-        <CardTitle className="font-headline flex items-center gap-2"><BarChart3 /> Your Usage Insights</CardTitle>
-        <CardDescription>Learn about your image analysis patterns.</CardDescription>
+        <CardTitle className="text-xl font-bold text-primary flex items-center gap-2"><BarChart3 /> Your Usage Insights</CardTitle>
+        <CardDescription className="text-muted-foreground">Learn about your image analysis patterns.</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading && <p className="text-muted-foreground">Generating insights...</p>}
         {!isLoading && !insights && <p className="text-muted-foreground">No insights available yet. Analyze some images to see your stats!</p>}
         {insights && (
-          <Alert className="bg-accent/50 border-accent">
-            <Lightbulb className="h-5 w-5 text-accent-foreground" />
-            <AlertTitle className="font-semibold text-accent-foreground">Insight</AlertTitle>
-            <AlertDescription className="text-accent-foreground/90">
+          <Alert className="bg-primary/10 border-primary/50 text-primary rounded-lg">
+            <Lightbulb className="h-5 w-5 text-primary" />
+            <AlertTitle className="font-semibold text-primary">Insight</AlertTitle>
+            <AlertDescription className="text-foreground/90">
               {insights}
             </AlertDescription>
           </Alert>

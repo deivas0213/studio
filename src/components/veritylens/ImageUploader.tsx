@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ImageIcon, CameraIcon, Link2Icon, Loader2, UploadCloud } from "lucide-react";
 import { ChangeEvent, useState, useRef } from "react";
-import Image from "next/image";
+import NextImage from "next/image"; // Renamed to avoid conflict with HTMLImageElement
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -35,6 +35,7 @@ type ImageUploaderProps = {
 export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
   const [activeTab, setActiveTab] = useState<"gallery" | "camera" | "url">("gallery");
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +44,7 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
     handleSubmit: handleUrlSubmit,
     formState: { errors: urlErrors },
     reset: resetUrlForm,
+    setValue: setUrlValue,
   } = useForm<{ imageUrl: string }>({
     resolver: zodResolver(urlSchema),
     defaultValues: { imageUrl: "" },
@@ -54,15 +56,16 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
       const validationResult = fileSchema.safeParse(file);
       if (validationResult.success) {
         setFilePreview(URL.createObjectURL(file));
-        // No direct submission here, user clicks "Analyze" button
+        setFileName(file.name);
       } else {
-        // Display error, ideally using react-hook-form for file input too
         alert(validationResult.error.errors.map(e => e.message).join('\n'));
         setFilePreview(null);
-        if (event.target) event.target.value = ""; // Clear the input
+        setFileName(null);
+        if (event.target) event.target.value = ""; 
       }
     } else {
       setFilePreview(null);
+      setFileName(null);
     }
   };
 
@@ -86,79 +89,95 @@ export function ImageUploader({ onAnalyze, isLoading }: ImageUploaderProps) {
   const onAnalyzeUrl = (data: { imageUrl: string }) => {
     onAnalyze({ url: data.imageUrl }, 'url');
     setFilePreview(null); 
+    setFileName(null);
   };
 
-  const clearPreviewAndInput = () => {
+  const clearAllInputs = () => {
     setFilePreview(null);
+    setFileName(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (cameraInputRef.current) cameraInputRef.current.value = "";
     resetUrlForm();
+    setUrlValue("imageUrl", "");
   };
 
+  const commonButtonClass = "futuristic-button text-lg py-3.5";
+  const commonInputClass = "futuristic-input h-12 text-base file:font-semibold file:border-0 file:bg-transparent file:text-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg hover:file:bg-primary/10";
+
+
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="font-headline flex items-center gap-2">
-          <UploadCloud className="text-primary" />
-          Upload Image for Analysis
+    <Card className="bg-card text-card-foreground shadow-xl rounded-20px border-0">
+      <CardHeader className="pb-4 pt-6">
+        <CardTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
+          <UploadCloud size={28} />
+          Verify Image Source
         </CardTitle>
-        <CardDescription>
-          Choose an image from your gallery, capture one with your camera, or provide a URL.
+        <CardDescription className="text-center text-muted-foreground pt-1">
+          Upload from Gallery, use Camera, or paste a URL.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-5">
         <Tabs defaultValue="gallery" className="w-full" onValueChange={(value) => {
           setActiveTab(value as "gallery" | "camera" | "url");
-          clearPreviewAndInput();
+          clearAllInputs();
         }}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="gallery"><ImageIcon className="mr-2" />Gallery</TabsTrigger>
-            <TabsTrigger value="camera"><CameraIcon className="mr-2" />Camera</TabsTrigger>
-            <TabsTrigger value="url"><Link2Icon className="mr-2" />URL</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-secondary/30 p-1 rounded-lg">
+            <TabsTrigger value="gallery" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <ImageIcon className="mr-2" />GALLERY
+            </TabsTrigger>
+            <TabsTrigger value="camera" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <CameraIcon className="mr-2" />CAMERA
+            </TabsTrigger>
+            <TabsTrigger value="url" className="py-2.5 text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-md text-primary hover:bg-primary/10">
+              <Link2Icon className="mr-2" />LINK
+            </TabsTrigger>
           </TabsList>
 
-          {filePreview && (activeTab === "gallery" || activeTab === "camera") && (
-            <div className="mb-4 p-4 border rounded-md bg-muted/50 flex justify-center items-center max-h-60 overflow-hidden">
-              <Image src={filePreview} alt="Selected preview" width={200} height={200} className="max-h-52 w-auto object-contain rounded-md" />
-            </div>
-          )}
-
-          <TabsContent value="gallery">
-            <div className="space-y-4">
-              <Label htmlFor="gallery-file" className="text-base">Select from Gallery</Label>
-              <Input id="gallery-file" type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="text-base file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
-              {filePreview && <Button onClick={onAnalyzeFile} disabled={isLoading} className="w-full text-base py-3">
-                {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} Analyze from Gallery
-              </Button>}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="camera">
-            <div className="space-y-4">
-              <Label htmlFor="camera-file" className="text-base">Use Camera</Label>
-              <Input id="camera-file" type="file" accept="image/*" capture="environment" onChange={handleFileChange} ref={cameraInputRef} className="text-base file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
-              {filePreview && <Button onClick={onAnalyzeFile} disabled={isLoading} className="w-full text-base py-3">
-                {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} Analyze from Camera
-              </Button>}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="url">
-            <form onSubmit={handleUrlSubmit(onAnalyzeUrl)} className="space-y-4">
-              <div>
-                <Label htmlFor="imageUrl" className="text-base">Image URL</Label>
-                <Controller
-                  name="imageUrl"
-                  control={urlControl}
-                  render={({ field }) => <Input id="imageUrl" type="url" placeholder="https://example.com/image.png" {...field} className="text-base" />}
-                />
-                {urlErrors.imageUrl && <p className="text-sm text-destructive mt-1">{urlErrors.imageUrl.message}</p>}
+          <div className="space-y-6">
+            {filePreview && (activeTab === "gallery" || activeTab === "camera") && (
+              <div className="mb-4 p-3 border border-primary/50 rounded-lg bg-black/30 flex flex-col justify-center items-center h-48 overflow-hidden">
+                <NextImage src={filePreview} alt="Selected preview" width={180} height={180} className="max-h-40 w-auto object-contain rounded-md" />
+                {fileName && <p className="text-xs text-muted-foreground mt-2 truncate max-w-full px-2">{fileName}</p>}
               </div>
-              <Button type="submit" disabled={isLoading} className="w-full text-base py-3">
-                {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} Fetch & Analyze URL
-              </Button>
-            </form>
-          </TabsContent>
+            )}
+
+            <TabsContent value="gallery" className="m-0">
+              <div className="space-y-4">
+                <Label htmlFor="gallery-file" className="sr-only">Select from Gallery</Label>
+                <Input id="gallery-file" type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className={commonInputClass} />
+                <Button onClick={onAnalyzeFile} disabled={isLoading || !filePreview} className={commonButtonClass}>
+                  {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM GALLERY
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="camera" className="m-0">
+              <div className="space-y-4">
+                <Label htmlFor="camera-file" className="sr-only">Use Camera</Label>
+                <Input id="camera-file" type="file" accept="image/*" capture="environment" onChange={handleFileChange} ref={cameraInputRef} className={commonInputClass} />
+                 <Button onClick={onAnalyzeFile} disabled={isLoading || !filePreview} className={commonButtonClass}>
+                  {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM CAMERA
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="url" className="m-0">
+              <form onSubmit={handleUrlSubmit(onAnalyzeUrl)} className="space-y-4">
+                <div>
+                  <Label htmlFor="imageUrl" className="sr-only">Image URL</Label>
+                  <Controller
+                    name="imageUrl"
+                    control={urlControl}
+                    render={({ field }) => <Input id="imageUrl" type="url" placeholder="Paste image link here..." {...field} className={`${commonInputClass} placeholder-muted-foreground/70`} />}
+                  />
+                  {urlErrors.imageUrl && <p className="text-sm text-destructive mt-2 px-1">{urlErrors.imageUrl.message}</p>}
+                </div>
+                <Button type="submit" disabled={isLoading} className={commonButtonClass}>
+                  {isLoading ? <Loader2 className="animate-spin mr-2" /> : null} ANALYZE FROM LINK
+                </Button>
+              </form>
+            </TabsContent>
+          </div>
         </Tabs>
       </CardContent>
     </Card>

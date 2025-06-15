@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AppHeader } from "@/components/veritylens/Header";
 import { ImageUploader } from "@/components/veritylens/ImageUploader";
 import { ResultDisplay } from "@/components/veritylens/ResultDisplay";
@@ -8,7 +9,8 @@ import { RecentScans } from "@/components/veritylens/RecentScans";
 import { UserInsights } from "@/components/veritylens/UserInsights";
 import { LoadingSpinner } from "@/components/veritylens/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, PenToolIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { analyzeImage } from "@/ai/flows/analyze-image";
@@ -17,7 +19,6 @@ import { getUsageInsights } from "@/ai/flows/get-usage-insights";
 
 import type { ScanResult, UploadHistoryItem } from "@/types";
 
-// Mock user ID for now
 const MOCK_USER_ID = "user123";
 
 export default function VerityLensPage() {
@@ -30,8 +31,9 @@ export default function VerityLensPage() {
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
 
   const { toast } = useToast();
+  const resultSectionRef = useRef<HTMLDivElement>(null);
 
-  // Helper function to convert File or fetched Blob to data URI
+
   const toDataURL = (data: File | Blob): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -43,22 +45,23 @@ export default function VerityLensPage() {
   const handleAnalyze = async (data: { file?: File; url?: string }, type: 'file' | 'url') => {
     setIsLoading(true);
     setError(null);
-    setAnalysisResult(null); // Clear previous result
+    setAnalysisResult(null); 
 
     let photoDataUri: string | undefined;
-    let originalImageUrl: string = ""; // This will be what's stored as imageUrl
-    let previewUrl: string = ""; // This is for the immediate preview
-    let sourceType: 'upload' | 'camera' | 'url' = type === 'file' ? 'upload' : 'url'; // Default for file
+    let originalImageUrl: string = ""; 
+    let previewUrl: string = ""; 
+    let sourceType: 'upload' | 'camera' | 'url' = type === 'file' ? 'upload' : 'url'; 
 
     try {
       if (data.file) {
-        if (data.file.name === 'camera_image.jpg') sourceType = 'camera'; // Simple heuristic for camera
+        if (data.file.name === 'camera_image.jpg' || type === 'file' && data.file.lastModified < Date.now() - 1000 * 60 ) { // Heuristic: if file is very recent, might be camera
+             sourceType = data.file.name.startsWith("camera_") ? 'camera' : 'upload'; // More specific check if possible
+        }
         photoDataUri = await toDataURL(data.file);
-        previewUrl = photoDataUri; // Data URI can be used for preview
-        originalImageUrl = `localfile:${data.file.name}`; // Placeholder for local file
+        previewUrl = photoDataUri; 
+        originalImageUrl = `localfile:${data.file.name}`; 
       } else if (data.url) {
         originalImageUrl = data.url;
-        // Fetch the image from URL and convert to data URI for analysis & preview
         const response = await fetch(`/api/proxy-image?url=${encodeURIComponent(data.url)}`);
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ message: 'Failed to fetch image from URL.' }));
@@ -66,7 +69,7 @@ export default function VerityLensPage() {
         }
         const blob = await response.blob();
         photoDataUri = await toDataURL(blob);
-        previewUrl = photoDataUri; // Use data URI for preview to avoid CORS issues with direct URL
+        previewUrl = photoDataUri; 
       }
 
       if (!photoDataUri) {
@@ -86,7 +89,13 @@ export default function VerityLensPage() {
       };
 
       setAnalysisResult(newScan);
-      setRecentScans(prevScans => [newScan, ...prevScans].slice(0, 10)); // Keep last 10
+      setRecentScans(prevScans => [newScan, ...prevScans].slice(0, 10)); 
+      
+      // Scroll to result section after a short delay to allow rendering
+      setTimeout(() => {
+        resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+
 
     } catch (err: any) {
       console.error("Analysis error:", err);
@@ -116,9 +125,8 @@ export default function VerityLensPage() {
       
       const insightsResult = await getUsageInsights({ userId: MOCK_USER_ID, uploadHistory });
       setUserInsights(insightsResult.insights);
-    } catch (err: any) {
+    } catch (err: any)      {
       console.error("Error fetching insights:", err);
-      // Don't show toast for insights error, just log it or display a mild message.
       setUserInsights("Could not load insights at this time.");
     } finally {
       setIsLoadingInsights(false);
@@ -126,8 +134,6 @@ export default function VerityLensPage() {
   }, [recentScans]);
 
   useEffect(() => {
-    // Fetch insights when recentScans change (e.g., after a new scan)
-    // Debounce or add a condition like "if scans > N" if this becomes too frequent
     if (recentScans.length > 0) {
       fetchUserInsights();
     }
@@ -135,26 +141,26 @@ export default function VerityLensPage() {
 
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
-      <main className="flex-grow container mx-auto px-4 py-2 md:px-6 md:py-4 space-y-8">
+      <main className="flex-grow container mx-auto px-5 py-4 md:py-6 space-y-10 md:space-y-12">
         <section aria-labelledby="image-upload-heading">
           <h2 id="image-upload-heading" className="sr-only">Verify Your Image</h2>
           <ImageUploader onAnalyze={handleAnalyze} isLoading={isLoading} />
         </section>
 
-        {isLoading && <LoadingSpinner message="Verifying image integrity..." />}
+        {isLoading && <LoadingSpinner message="VERIFYING IMAGE INTEGRITY..." />}
         
         {error && !isLoading && (
-          <Alert variant="destructive" className="animate-fadeIn">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+          <Alert variant="destructive" className="animate-fadeIn bg-destructive/10 border-destructive text-destructive-foreground p-5 rounded-lg">
+            <AlertTriangle className="h-6 w-6 text-destructive" />
+            <AlertTitle className="text-lg font-bold">Error Occurred</AlertTitle>
+            <AlertDescription className="text-base">{error}</AlertDescription>
           </Alert>
         )}
         
         {analysisResult && !isLoading && (
-          <section aria-labelledby="analysis-result-heading" className="animate-fadeIn">
+          <section ref={resultSectionRef} aria-labelledby="analysis-result-heading" className="animate-fadeIn">
             <h2 id="analysis-result-heading" className="sr-only">Analysis Result</h2>
             <ResultDisplay result={analysisResult} />
           </section>
@@ -164,7 +170,9 @@ export default function VerityLensPage() {
           <h2 id="recent-scans-heading" className="sr-only">Recent Scans</h2>
            <RecentScans scans={recentScans} onSelectScan={(scan) => {
              setAnalysisResult(scan);
-             window.scrollTo({ top: 0, behavior: 'smooth' });
+             setTimeout(() => {
+               resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+             }, 100);
            }} />
         </section>
 
@@ -172,9 +180,22 @@ export default function VerityLensPage() {
            <h2 id="user-insights-heading" className="sr-only">User Insights</h2>
           <UserInsights insights={userInsights} isLoading={isLoadingInsights} />
         </section>
+        
+        <section aria-labelledby="extra-features-heading" className="pt-4">
+            <h2 id="extra-features-heading" className="sr-only">Extra Features</h2>
+            <Button
+              variant="outline"
+              className="futuristic-button border-dashed border-primary/50 text-primary/70 hover:bg-secondary/50 hover:text-primary hover:border-primary"
+              disabled={true}
+            >
+              <PenToolIcon className="mr-2" />
+              EXTRA (COMING SOON)
+            </Button>
+        </section>
+
       </main>
-      <footer className="py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} VerityLens. All rights reserved.
+      <footer className="py-8 text-center text-sm text-muted-foreground">
+        © {new Date().getFullYear()} VerityLens. AI Lab Division.
       </footer>
     </div>
   );

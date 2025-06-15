@@ -7,11 +7,11 @@ interface LoadingSpinnerProps {
   message?: string;
 }
 
-export function LoadingSpinner({ size = 48, message = "Analyzing..." }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 56, message = "ANALYZING IMAGE..." }: LoadingSpinnerProps) {
   return (
-    <div className="flex flex-col items-center justify-center space-y-2 py-8" role="status" aria-live="polite">
+    <div className="flex flex-col items-center justify-center space-y-3 py-10" role="status" aria-live="polite">
       <Loader2 className="animate-spin text-primary" style={{ width: size, height: size }} />
-      {message && <p className="text-muted-foreground">{message}</p>}
+      {message && <p className="text-lg font-semibold text-primary tracking-wider">{message}</p>}
     </div>
   );
 }
