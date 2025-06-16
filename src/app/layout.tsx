@@ -25,6 +25,7 @@ export default function RootLayout({
         
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
+        {/* Updated Apple touch icon path */}
         <link rel="apple-touch-icon" href="/unmask_ai_icon_180.png" data-ai-hint="app icon apple" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
